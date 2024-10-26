@@ -11,7 +11,7 @@
 <body>
 
 <div class="container">
-  <h2>Vertical (basic) form</h2>
+  <h2>Vertical form</h2>
   <form action="{{ route('store') }}" method="POST">
   @csrf
     <div class="form-group">
