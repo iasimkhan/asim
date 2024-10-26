@@ -1,0 +1,48 @@
+name: Deploy Laravel Application
+
+on:
+  push:
+    branches:
+      - main  # Trigger deployment on push to the main branch
+
+jobs:
+  deploy:
+    name: Deploy Application
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the latest code from the repository
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up PHP
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'  # Ensure this matches your Laravel PHP version
+          extensions: mbstring, bcmath, xml, intl, json, pdo, tokenizer, curl, fileinfo
+
+      # Step 3: Install Composer dependencies
+      - name: Install Dependencies
+        run: |
+          composer install --no-dev --optimize-autoloader
+
+      # Step 5: Upload project to web host via FTP
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@4.3.3
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./                       # Directory of the Laravel project
+          server-dir: /  # Path to your server's root directory
+          exclude: vendor/                     # Exclude the vendor directory
+
+    
+
+      # Step 7: Cache Config (optional for optimization)
+      - name: Optimize Laravel Configuration
+        run: |
+          php artisan config:cache
+          php artisan route:cache
+
